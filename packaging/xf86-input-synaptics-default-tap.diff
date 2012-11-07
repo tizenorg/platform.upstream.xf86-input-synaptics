@@ -1,0 +1,17 @@
+---
+ conf/50-synaptics.conf |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/conf/50-synaptics.conf
++++ b/conf/50-synaptics.conf
+@@ -16,6 +16,10 @@ Section "InputClass"
+ # http://who-t.blogspot.com/2010/11/how-to-ignore-configuration-errors.html
+         MatchDevicePath "/dev/input/event*"
+         Option	"HorizScrollDelta"	"0"
++# enable tap-to-click as default (bnc#722457)
++	Option "TapButton1" "1"
++	Option "TapButton1" "2"
++	Option "TapButton1" "3"
+ EndSection
+ 
+ Section "InputClass"

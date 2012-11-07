@@ -1,0 +1,48 @@
+---
+ src/eventcomm.c |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+--- a/src/eventcomm.c
++++ b/src/eventcomm.c
+@@ -516,6 +516,8 @@
+     int i;
+     Bool touchpad_found = FALSE;
+     struct dirent **namelist;
++    int wait = 0;
++    const int max_wait = 2000;
+ 
+     if (device) {
+         int fd = -1;
+@@ -533,6 +535,7 @@
+         }
+     }
+ 
++    while (wait <= max_wait && !touchpad_found) {
+     i = scandir(DEV_INPUT_EVENT, &namelist, EventDevOnly, alphasort);
+     if (i < 0) {
+         xf86IDrvMsg(pInfo, X_ERROR, "Couldn't open %s\n", DEV_INPUT_EVENT);
+@@ -556,8 +559,8 @@
+ 
+             if (event_query_is_touchpad(fd, TRUE)) {
+                 touchpad_found = TRUE;
+-                xf86IDrvMsg(pInfo, X_PROBED, "auto-dev sets device to %s\n",
+-                            fname);
++                xf86IDrvMsg(pInfo, X_PROBED, "auto-dev sets device to %s (waited %d msec)\n",
++                            fname, wait);
+                 pInfo->options =
+                     xf86ReplaceStrOption(pInfo->options, "Device", fname);
+             }
+@@ -565,6 +568,13 @@
+         }
+         free(namelist[i]);
+     }
++    if (!touchpad_found) {
++        xf86IDrvMsg(pInfo, X_ERROR, "waiting 100 msec to become devices ready\n");
++        usleep(100*1000);
++        wait += 100;
++        xf86IDrvMsg(pInfo, X_ERROR, "aiting time total: %d\n", wait);
++    }
++    } /* while (wait <= max_wait && !touchpad_found) */
+ 
+     free(namelist);
+ 
