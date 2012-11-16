@@ -6,9 +6,6 @@ Summary:        Synaptics touchpad input driver for the Xorg X server
 Url:            http://xorg.freedesktop.org/
 Group:          System/X11/Servers/XF86_4
 Source0:        http://xorg.freedesktop.org/releases/individual/driver/%{name}-%{version}.tar.bz2
-Patch0:         xf86-input-synaptics-wait.diff
-Patch2:         xf86-input-synaptics-xorg.conf.d_snippet.diff
-Patch5:         xf86-input-synaptics-default-tap.diff
 BuildRequires:  autoconf >= 2.60
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -47,9 +44,6 @@ become available.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch2 -p1
-%patch5 -p1
 
 %build
 autoreconf -fi
