@@ -6,6 +6,7 @@ Summary:        Synaptics touchpad input driver for the Xorg X server
 Url:            http://xorg.freedesktop.org/
 Group:          System/X11/Servers/XF86_4
 Source0:        http://xorg.freedesktop.org/releases/individual/driver/%{name}-%{version}.tar.bz2
+Source1001: 	xf86-input-synaptics.manifest
 BuildRequires:  autoconf >= 2.60
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -44,6 +45,7 @@ become available.
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 %build
 autoreconf -fi
@@ -65,6 +67,7 @@ udevadm trigger --subsystem-match=input --action=change
 exit 0
 
 %files
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %doc COPYING README
 %config %{_sysconfdir}/X11/xorg.conf.d/50-synaptics.conf
@@ -74,6 +77,7 @@ exit 0
 %{_bindir}/syndaemon
 
 %files devel
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_includedir}/xorg/synaptics.h
 %{_includedir}/xorg/synaptics-properties.h
