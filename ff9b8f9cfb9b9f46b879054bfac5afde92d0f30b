@@ -1,0 +1,8 @@
+Change-Id: Iff9b8f9cfb9b9f46b879054bfac5afde92d0f30b
+Code-Review+2: Ryan Ware <ware@linux.intel.com>
+Verified+1: Ryan Ware <ware@linux.intel.com>
+Submitted-by: Ryan Ware <ware@linux.intel.com>
+Submitted-at: Mon, 08 Jul 2013 09:38:18 -0700
+Reviewed-on: https://review.tizen.org/gerrit/5022
+Project: platform/upstream/xf86-input-synaptics
+Branch: refs/heads/tizen
