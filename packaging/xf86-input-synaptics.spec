@@ -1,3 +1,5 @@
+%bcond_with x
+
 Name:           xf86-input-synaptics
 Version:        1.6.2
 Release:        0
@@ -23,6 +25,10 @@ BuildRequires:  pkgconfig(xorg-server) >= 1.7
 BuildRequires:  pkgconfig(xproto)
 BuildRequires:  pkgconfig(xtst)
 Requires:       udev
+
+%if !%{with x}
+ExclusiveArch:
+%endif
 
 %description
 synaptics is an Xorg input driver for touchpads.
