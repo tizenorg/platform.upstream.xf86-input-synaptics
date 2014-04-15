@@ -1,7 +1,7 @@
 %bcond_with x
 
 Name:           xf86-input-synaptics
-Version:        1.6.2
+Version:        1.6.4
 Release:        0
 License:        MIT
 Summary:        Synaptics touchpad input driver for the Xorg X server
