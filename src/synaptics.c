@@ -1154,6 +1154,7 @@ SynapticsReset(SynapticsPrivate * priv)
     priv->prev_z = 0;
     priv->prevFingers = 0;
 #ifdef HAVE_MULTITOUCH
+    priv->num_active_touches = 0;
     memset(priv->open_slots, 0, priv->num_slots * sizeof(int));
 #endif
 }
@@ -2784,9 +2785,10 @@ clickpad_guess_clickfingers(SynapticsPrivate * priv,
     int nfingers = 0;
 
 #if HAVE_MULTITOUCH
-    char close_point[SYNAPTICS_MAX_TOUCHES] = { 0 };    /* 1 for each point close
-                                                           to another one */
+    uint32_t close_point = 0; /* 1 bit for each point close to another one */
     int i, j;
+
+    BUG_RETURN_VAL(hw->num_mt_mask > sizeof(close_point) * 8, 0);
 
     for (i = 0; i < hw->num_mt_mask - 1; i++) {
         ValuatorMask *f1;
@@ -2819,14 +2821,16 @@ clickpad_guess_clickfingers(SynapticsPrivate * priv,
              * size. Good luck. */
             if (abs(x1 - x2) < (priv->maxx - priv->minx) * .3 &&
                 abs(y1 - y2) < (priv->maxy - priv->miny) * .3) {
-                close_point[j] = 1;
-                close_point[i] = 1;
+                close_point |= (1 << j);
+                close_point |= (1 << i);
             }
         }
     }
 
-    for (i = 0; i < SYNAPTICS_MAX_TOUCHES; i++)
-        nfingers += close_point[i];
+    while (close_point > 0) {
+        nfingers += close_point & 0x1;
+        close_point >>= 1;
+    }
 #endif
 
     return nfingers;
@@ -3118,6 +3122,7 @@ UpdateTouchState(InputInfoPtr pInfo, struct SynapticsHwState *hw)
         if (hw->slot_state[i] == SLOTSTATE_OPEN) {
             priv->open_slots[priv->num_active_touches] = i;
             priv->num_active_touches++;
+            BUG_WARN(priv->num_active_touches > priv->num_slots);
         }
         else if (hw->slot_state[i] == SLOTSTATE_CLOSE) {
             Bool found = FALSE;
@@ -3305,6 +3310,9 @@ HandleState(InputInfoPtr pInfo, struct SynapticsHwState *hw, CARD32 now,
 
     inside_active_area = is_inside_active_area(priv, hw->x, hw->y);
 
+    /* these two just update hw->left, right, etc. */
+    update_hw_button_state(pInfo, hw, priv->old_hw_state, now, &delay);
+
     /* now we know that these _coordinates_ aren't in the area.
        invalid are: x, y, z, numFingers, fingerWidth
        valid are: millis, left/right/middle/up/down/etc.
@@ -3316,8 +3324,6 @@ HandleState(InputInfoPtr pInfo, struct SynapticsHwState *hw, CARD32 now,
          * really release, the finger should remain down. */
     }
 
-    /* these two just update hw->left, right, etc. */
-    update_hw_button_state(pInfo, hw, priv->old_hw_state, now, &delay);
     if (priv->has_scrollbuttons)
         double_click = adjust_state_from_scrollbuttons(pInfo, hw);
 
